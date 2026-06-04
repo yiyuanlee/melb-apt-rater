@@ -1,40 +1,58 @@
 'use server'
 
-import { supabase } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
+import {
+  getClientIp,
+  hashClientIp,
+  parseReviewInput,
+} from '@/lib/review-security';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 
 export async function submitReview(formData: FormData) {
-  const apartmentId = formData.get('apartmentId') as string;
-  // 确保分数是数字
-  const score = parseInt(formData.get('score') as string);
-  const content = formData.get('content') as string;
+  const parsed = parseReviewInput(formData);
+  if ('error' in parsed) {
+    return { error: parsed.error };
+  }
 
-  // 1. 获取用户 IP (Next.js 15+ headers 是异步的)
+  const { apartmentId, score, content } = parsed;
+
+  const supabaseAdmin = getSupabaseAdmin();
+  if (!supabaseAdmin) {
+    console.error('Missing SUPABASE_SERVICE_ROLE_KEY');
+    return { error: '服务未配置完成，请联系管理员' };
+  }
+
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for') || 'unknown';
-  
-  // 生成简单的 IP 指纹 (防止刷分)
-  const ipHash = btoa(ip).slice(0, 10); 
+  const ipHash = hashClientIp(getClientIp(headersList));
 
-  // 2. 检查该 IP 是否在 24 小时内给该公寓打过分
-  const { data: existing } = await supabase
+  const { data: apartment, error: aptError } = await supabaseAdmin
+    .from('apartments')
+    .select('id')
+    .eq('id', apartmentId)
+    .maybeSingle();
+
+  if (aptError || !apartment) {
+    return { error: '公寓不存在' };
+  }
+
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: existing } = await supabaseAdmin
     .from('reviews')
     .select('id')
     .eq('apartment_id', apartmentId)
     .eq('ip_hash', ipHash)
-    .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-    .single();
+    .gte('created_at', since)
+    .maybeSingle();
 
   if (existing) {
     return { error: '⚠️ 提交太频繁了，24小时内只能评一次哦' };
   }
 
-  // 3. 写入数据库
-  const { error } = await supabase.from('reviews').insert({
+  const { error } = await supabaseAdmin.from('reviews').insert({
     apartment_id: apartmentId,
-    score: score,
-    content: content,
+    score,
+    content,
     ip_hash: ipHash,
   });
 
@@ -43,12 +61,7 @@ export async function submitReview(formData: FormData) {
     return { error: '提交失败，请重试' };
   }
 
-  // 4. 🚀 关键步骤：清除缓存，强制刷新数据
-  
-  // 刷新详情页：让用户立刻看到自己的评论
   revalidatePath(`/apartment/${apartmentId}`);
-
-  // 🛑 刷新首页：让首页的"平均分"和"评分人数"也立刻变动
   revalidatePath('/');
 
   return { success: true };

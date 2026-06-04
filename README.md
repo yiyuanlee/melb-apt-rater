@@ -90,12 +90,18 @@ npm install
 
 ### 3. 配置环境变量
 
-在项目根目录创建 **.env.local**：
+复制 `.env.example` 为 **.env.local** 并填写：
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=你的_Supabase_Project_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=你的_Supabase_Anon_Key
+
+# 仅服务端使用，切勿加 NEXT_PUBLIC_ 前缀，不要提交到 Git
+SUPABASE_SERVICE_ROLE_KEY=你的_service_role_密钥
 ```
+
+`service_role` 在 Supabase：**Project Settings → API → service_role (secret)**。  
+Vercel 部署时也要在环境变量里添加同名项（不要勾选暴露给浏览器）。
 
 ### 4. 启动开发环境
 
@@ -104,6 +110,18 @@ npm run dev
 ```
 
 访问：http://localhost:3000
+
+---
+
+## 🔒 安全配置（必做）
+
+评论写入**不能**依赖浏览器里的 anon key，否则他人可直接调 Supabase API 刷评。
+
+1. 在 Supabase **SQL Editor** 运行 **`SQL/RLS_policies.sql`**  
+   - 公开读：`apartments` / `reviews` 允许 `SELECT`  
+   - 禁止匿名写：anon key 无法 `INSERT` / `UPDATE` / `DELETE`  
+2. 在 `.env.local` 与 Vercel 配置 **`SUPABASE_SERVICE_ROLE_KEY`**（仅 Server Action 使用）  
+3. 评分提交经 `app/actions.ts` 校验：分数 1–10、内容长度、公寓存在、24h IP 限制  
 
 ---
 

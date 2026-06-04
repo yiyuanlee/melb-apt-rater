@@ -55,6 +55,7 @@ export default function ReviewForm({ apartmentId }: { apartmentId: string }) {
         <textarea
           name="content"
           required
+          maxLength={1000}
           placeholder="展开说说，这公寓隔音怎么样？电梯快吗？"
           className="w-full p-3 border rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#c01d2e] min-h-[100px]"
         />
