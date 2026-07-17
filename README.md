@@ -1,138 +1,147 @@
-# 🏢 MelbScore - 墨尔本公寓评分网  
-**一个基于 Next.js + Supabase 构建的“虎扑风格”墨尔本公寓点评社区**
+# MelbScore — Melbourne Apartment Ratings
 
-MelbScore 是专为 **墨尔本留学生、上班族与租房群体** 打造的公寓评分与点评平台。  
-灵感来源于「虎扑评分」，旨在让租客快速了解公寓真实居住体验，避免踩坑。
+**A Hupu-style apartment review community for Melbourne, built with Next.js + Supabase.**
 
-平台提供 **公寓评分、热门榜单、大图沉浸式详情页、评论社区、简单风控等功能**，帮助用户更透明地了解墨尔本各大公寓。
+MelbScore helps **international students, office workers, and renters in Melbourne** share and discover real apartment living experiences. Inspired by Hupu-style scoring, it makes it easier to learn how a building actually feels to live in—before you sign a lease.
 
----
+Browse ratings, hot rankings, immersive detail pages, and community reviews—with lightweight anti-abuse controls so scores stay more trustworthy.
 
-## 📖 项目简介
+**Live demo:** [https://melbaptrater.vercel.app](https://melbaptrater.vercel.app)
 
-**MelbScore 的核心目标：让每一个准备在墨尔本租房的人都能看到真实评价。**
-
-用户可以：
-
-- 🔥 浏览墨尔本热门公寓排名（按评论数自动排序）  
-- ⭐ 查看实时公寓平均分（1–10 分制）  
-- 📝 提交自己的居住体验评分与评论  
-- 🖼️ 体验沉浸式的大图详情页  
-- 🛡️ 在简单风控机制下防止重复刷分  
-- 📡 浏览来自 Supabase、本地与 Unsplash 的混合图源  
+> 中文文档见 [README.zh-CN.md](./README.zh-CN.md)
 
 ---
 
-## ✨ 核心功能亮点
+## Overview
 
-### 🔥 热门榜单（自动排序）
-首页根据评论数量计算热度，展示最热门的公寓。
+**Goal:** give everyone looking to rent in Melbourne access to honest, community-driven reviews.
 
-### ⭐ 实时评分系统
-- 用户打分后数据直接写入数据库  
-- PostgreSQL 触发器自动更新平均分与评分人数  
-- 无需后端手动计算  
+You can:
 
-### 🖼️ 沉浸式视觉体验
-- 公寓详情页采用大图背景  
-- 醒目的评分展示  
-- 页面风格“虎扑味”十足  
-
-### 🛡️ 防刷票机制
-基于 **IP Hash** 的简单风控：
-- 限制同一 IP 24 小时内重复打分  
-- 保证评分更客观  
-
-### 💬 评论社区
-用户可以评论以下维度：
-- 隔音
-- 电梯速度
-- 物业质量
-- 安全性
-- 周边配套  
-等等……
-
-### 🖼️ 多来源图像系统
-支持多图源混用：
-- Supabase storage（云端上传）  
-- 本地 public/ 静态图  
-- Unsplash（网络图）  
+- Browse popular Melbourne apartments (sorted by review activity)
+- See live average scores on a **1–10** scale
+- Submit your own rating and written experience
+- Open immersive, full-bleed apartment detail pages
+- Rely on simple rate limiting to reduce duplicate spam scores
+- View images from Supabase Storage, local `public/` assets, and Unsplash
 
 ---
 
-## 🛠 技术栈
+## Features
 
-| 分类 | 技术 |
-|------|------|
-| 前端框架 | **Next.js 15 (App Router)** |
-| 语言 | **TypeScript** |
-| CSS | Tailwind CSS |
-| 后端 | Supabase (PostgreSQL) |
-| 图标库 | Lucide React |
-| 部署 | Vercel |
+### Hot rankings
+
+The homepage ranks apartments by review volume so the most-discussed buildings surface first.
+
+### Real-time ratings
+
+- Scores and comments are written to the database on submit
+- A PostgreSQL trigger keeps `rating_avg` and `rating_count` in sync
+- No manual backend recalculation required
+
+### Immersive detail pages
+
+- Large cover imagery on apartment pages
+- Clear score presentation
+- Community-first, review-focused layout
+
+### Anti-spam controls
+
+Simple **IP hash** rate limiting:
+
+- Blocks repeat scoring from the same IP within 24 hours
+- Helps keep ratings more objective
+
+### Review community
+
+Renters commonly discuss:
+
+- Soundproofing
+- Elevator speed
+- Property management quality
+- Safety
+- Nearby amenities
+
+### Multi-source images
+
+Supports mixed image sources:
+
+- Supabase Storage (cloud uploads)
+- Local static files under `public/`
+- Unsplash (remote images)
 
 ---
 
-## 🚀 快速开始
+## Tech stack
 
-### 1. 克隆项目
+| Layer | Technology |
+|------|------------|
+| Framework | **Next.js** (App Router) |
+| Language | **TypeScript** |
+| Styling | Tailwind CSS |
+| Backend / DB | Supabase (PostgreSQL) |
+| Icons | Lucide React |
+| Hosting | Vercel |
+
+---
+
+## Quick start
+
+### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/melbscore.git
-cd melbscore
+git clone https://github.com/yiyuanlee/melb_apt_rater.git
+cd melb_apt_rater
 ```
 
-### 2. 安装依赖
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. 配置环境变量
+### 3. Configure environment variables
 
-复制 `.env.example` 为 **.env.local** 并填写：
+Copy `.env.example` to **`.env.local`** and fill in:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=你的_Supabase_Project_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY=你的_Supabase_Anon_Key
+NEXT_PUBLIC_SUPABASE_URL=your_Supabase_Project_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_Supabase_Anon_Key
 
-# 仅服务端使用，切勿加 NEXT_PUBLIC_ 前缀，不要提交到 Git
-SUPABASE_SERVICE_ROLE_KEY=你的_service_role_密钥
+# Server-only — do NOT prefix with NEXT_PUBLIC_, and never commit this
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_secret
 ```
 
-`service_role` 在 Supabase：**Project Settings → API → service_role (secret)**。  
-Vercel 部署时也要在环境变量里添加同名项（不要勾选暴露给浏览器）。
+Find `service_role` in Supabase: **Project Settings → API → service_role (secret)**.  
+On Vercel, add the same variables (do not expose the service role key to the browser).
 
-### 4. 启动开发环境
+### 4. Run the dev server
 
 ```bash
 npm run dev
 ```
 
-访问：http://localhost:3000
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 🔒 安全配置（必做）
+## Security setup (required)
 
-评论写入**不能**依赖浏览器里的 anon key，否则他人可直接调 Supabase API 刷评。
+Review writes must **not** go through the browser anon key alone—otherwise anyone can call the Supabase API and spam ratings.
 
-1. 在 Supabase **SQL Editor** 运行 **`SQL/RLS_policies.sql`**  
-   - 公开读：`apartments` / `reviews` 允许 `SELECT`  
-   - 禁止匿名写：anon key 无法 `INSERT` / `UPDATE` / `DELETE`  
-2. 在 `.env.local` 与 Vercel 配置 **`SUPABASE_SERVICE_ROLE_KEY`**（仅 Server Action 使用）  
-3. 评分提交经 `app/actions.ts` 校验：分数 1–10、内容长度、公寓存在、24h IP 限制  
-
----
-
-## 🗄️ 数据库配置（Supabase）
-
-本项目依赖 Supabase 的 PostgreSQL。  
-请在 Supabase 的 **SQL Editor** 中运行以下内容。
+1. In the Supabase **SQL Editor**, run **`SQL/RLS_policies.sql`**
+   - Public read: allow `SELECT` on `apartments` / `reviews`
+   - Block anonymous writes: anon key cannot `INSERT` / `UPDATE` / `DELETE`
+2. Set **`SUPABASE_SERVICE_ROLE_KEY`** in `.env.local` and Vercel (Server Actions only)
+3. Submissions are validated in `app/actions.ts`: score 1–10, content length, apartment exists, 24h IP limit
 
 ---
 
-### 1. 建表 SQL
+## Database setup (Supabase)
+
+This project uses Supabase PostgreSQL. Run the following in the Supabase **SQL Editor**.
+
+### 1. Create tables
 
 ```sql
 CREATE TABLE apartments (
@@ -157,16 +166,14 @@ CREATE TABLE reviews (
 );
 ```
 
----
-
-### 2. 自动评分触发器（Trigger）
+### 2. Auto-update rating stats (trigger)
 
 ```sql
 CREATE OR REPLACE FUNCTION update_apartment_stats()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE apartments
-    SET 
+    SET
         rating_avg = (
             SELECT COALESCE(ROUND(AVG(score), 1), 0)
             FROM reviews
@@ -189,12 +196,14 @@ FOR EACH ROW
 EXECUTE FUNCTION update_apartment_stats();
 ```
 
+You can also use the SQL scripts under the [`SQL/`](./SQL) folder (seeds, RLS policies, rating updater).
+
 ---
 
-## 📂 项目结构
+## Project structure
 
 ```
-melbscore/
+melb_apt_rater/
 ├── app/
 │   ├── page.tsx
 │   ├── actions.ts
@@ -203,42 +212,45 @@ melbscore/
 │   ├── ApartmentCard.tsx
 │   └── ReviewForm.tsx
 ├── lib/
-│   └── supabase.ts
+│   ├── supabase.ts
+│   ├── supabase-admin.ts
+│   └── review-security.ts
+├── SQL/
 ├── public/
 └── next.config.ts
 ```
 
 ---
 
-## 🚢 部署 (Deployment)
+## Deployment
 
-使用 Vercel：
+Deploy on Vercel:
 
-1. 推送代码到 GitHub  
-2. 在 Vercel 导入此仓库  
-3. 填写环境变量  
-4. 点击 Deploy  
-
----
-
-## 📝 Roadmap
-
-- [x] 基础评分与评论系统  
-- [x] 图片展示（本地 + 网络图）  
-- [ ] 搜索功能  
-- [ ] 地图模式  
-- [ ] 用户登录  
-- [ ] 评论图片上传  
-- [ ] 多维评分（隔音、安全等）  
+1. Push the repo to GitHub
+2. Import the project in Vercel
+3. Add the environment variables
+4. Deploy
 
 ---
 
-## 🤝 贡献
+## Roadmap
 
-欢迎提交 Issue 或 PR，欢迎 Star 项目支持！
+- [x] Basic rating & review system
+- [x] Image display (local + remote)
+- [ ] Search
+- [ ] Map mode
+- [ ] User authentication
+- [ ] Review image uploads
+- [ ] Multi-dimension scores (soundproofing, safety, etc.)
 
 ---
 
-## 📄 License
+## Contributing
+
+Issues and pull requests are welcome. Stars are appreciated!
+
+---
+
+## License
 
 MIT License
