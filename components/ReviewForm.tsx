@@ -1,28 +1,38 @@
 'use client'
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { submitReview } from '@/app/actions';
 
 export default function ReviewForm({ apartmentId }: { apartmentId: string }) {
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
   const [score, setScore] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   async function handleSubmit(formData: FormData) {
     if (score === 0) {
-      setMessage('⚠️ 还没打分呢！');
+      setIsSuccess(false);
+      setMessage('还没打分呢！');
       return;
     }
     setIsSubmitting(true);
     setMessage('');
-    
+    setIsSuccess(false);
+
     const result = await submitReview(formData);
-    
+
     if (result.error) {
+      setIsSuccess(false);
       setMessage(result.error);
     } else {
-      setMessage('✅ 评价成功！');
-      // 可选：这里可以清空表单
+      setIsSuccess(true);
+      setMessage('评价成功！');
+      setScore(0);
+      formRef.current?.reset();
+      router.refresh();
     }
     setIsSubmitting(false);
   }
@@ -31,7 +41,7 @@ export default function ReviewForm({ apartmentId }: { apartmentId: string }) {
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
       <h3 className="font-bold text-lg mb-4">我来打分</h3>
       
-      <form action={handleSubmit}>
+      <form ref={formRef} action={handleSubmit}>
         <input type="hidden" name="apartmentId" value={apartmentId} />
         <input type="hidden" name="score" value={score} />
 
@@ -61,7 +71,13 @@ export default function ReviewForm({ apartmentId }: { apartmentId: string }) {
         />
 
         <div className="flex justify-between items-center mt-4">
-          <span className="text-red-600 text-sm font-bold">{message}</span>
+          <span
+            className={`text-sm font-bold ${
+              isSuccess ? 'text-green-600' : 'text-red-600'
+            }`}
+          >
+            {message}
+          </span>
           <button
             type="submit"
             disabled={isSubmitting}

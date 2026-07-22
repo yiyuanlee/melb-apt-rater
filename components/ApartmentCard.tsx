@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { MessageSquare } from 'lucide-react';
+import { resolveCoverImage } from '@/lib/cover-image';
 
 interface ApartmentProps {
   id: string;
@@ -12,15 +13,8 @@ interface ApartmentProps {
 }
 
 export default function ApartmentCard({ apartment }: { apartment: ApartmentProps }) {
-  // 1. 定义一张永远可用的默认图 (Unsplash 风景图)
-  const defaultImage = 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
-  
-  // 2. 核心修复逻辑：
-  // 如果 cover_image 是 null、undefined 或 "" (空字符串)，就自动使用 defaultImage
-  // 使用 || 运算符是最稳健的写法
-  const displayImage = apartment.cover_image || defaultImage;
+  const displayImage = resolveCoverImage(apartment.cover_image);
 
-  // 3. 评分颜色逻辑
   const scoreColor = apartment.rating_avg >= 9.0 ? 'bg-[#c01d2e]' : 
                      apartment.rating_avg >= 6.0 ? 'bg-[#ff4d4f]' : 'bg-gray-500';
 
@@ -31,7 +25,7 @@ export default function ApartmentCard({ apartment }: { apartment: ApartmentProps
         {/* 图片区域 */}
         <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
           <Image
-            src={displayImage} // 👈 使用修复后的变量
+            src={displayImage}
             alt={apartment.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-105"

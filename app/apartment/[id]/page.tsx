@@ -1,7 +1,8 @@
-import { createClient } from '@supabase/supabase-js'; // 直接引入 createClient
 import ReviewForm from '@/components/ReviewForm';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import { resolveCoverImage } from '@/lib/cover-image';
+import { supabase } from '@/lib/supabase';
 
 // 强制动态渲染，确保每次访问都获取最新评分
 export const dynamic = 'force-dynamic';
@@ -13,24 +14,7 @@ type Props = {
 export default async function ApartmentDetail({ params }: Props) {
   const { id } = await params;
 
-  // 1. 创建一个强制不缓存的 Supabase 客户端
-  // (和首页保持一致，解决 Vercel 上数据不刷新的问题)
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      global: {
-        fetch: (url, options) => {
-          return fetch(url, {
-            ...options,
-            cache: 'no-store',
-          });
-        },
-      },
-    }
-  );
-
-  // 2. 并行获取：公寓详情 + 评论列表
+  // 并行获取：公寓详情 + 评论列表
   const [aptResult, reviewsResult] = await Promise.all([
     supabase.from('apartments').select('*').eq('id', id).single(),
     supabase.from('reviews').select('*').eq('apartment_id', id).order('upvotes', { ascending: false })
@@ -39,21 +23,9 @@ export default async function ApartmentDetail({ params }: Props) {
   const apartment = aptResult.data;
   const reviews = reviewsResult.data || [];
 
-  // 如果找不到公寓，返回 404
   if (!apartment) return notFound();
 
-  // --- 3. 图片路径智能修复逻辑 ---
-  const defaultImage = 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80';
-  
-  // 优先用数据库的图，没有则用默认图
-  let displayImage = apartment.cover_image || defaultImage;
-
-  // 防御性编程：如果是本地图片(不含http)且忘了加斜杠，自动补上
-  // 例如：数据库存 "aurora.jpg" -> 自动改为 "/aurora.jpg"
-  if (displayImage && !displayImage.startsWith('http') && !displayImage.startsWith('/')) {
-    displayImage = `/${displayImage}`;
-  }
-  // ------------------------------
+  const displayImage = resolveCoverImage(apartment.cover_image);
 
   return (
     <div className="min-h-screen bg-[#f7f7f8] pb-20">
@@ -61,7 +33,7 @@ export default async function ApartmentDetail({ params }: Props) {
       {/* 顶部大图区 */}
       <div className="relative h-64 md:h-80 w-full bg-gray-900">
         <Image 
-          src={displayImage} // 👈 使用修复后的路径
+          src={displayImage}
           alt={apartment.name} 
           fill 
           className="object-cover opacity-70"

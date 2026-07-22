@@ -21,7 +21,7 @@ VALUES
   ),
   (
     'Victoria One', 
-    '/victoriaone.jpg', 
+    '/victoria-one.jpg', 
     '462 Elizabeth St, Melbourne', 
     ARRAY['户型小', '位置好', '很多留学生'], 
     0, 0
@@ -35,7 +35,7 @@ VALUES
   ),
   (
     'Swanston Central', 
-    '/swanstoncentral.jpg', 
+    '/swanstoncentral.jpeg', 
     '168 Victoria St, Carlton', 
     ARRAY['地标建筑', '设施豪华', '近墨大'], 
     0, 0
@@ -70,49 +70,49 @@ VALUES
   ),
   (
     'Scape Swanston', 
-    '/scape.jpg', 
+    '/Scape_Swanston.jpg', 
     '393 Swanston St, Melbourne', 
     ARRAY['学生公寓', '包含Bill', 'RMIT对面'], 
     0, 0
   ),
   (
     'UniLodge Lincoln House', 
-    '/unilodge.jpg', 
+    '/unilodge-lincoln-house.jpg', 
     '125 Bouverie St, Carlton', 
     ARRAY['近墨大', '社交氛围好', '工业风'], 
     0, 0
   ),
   (
     'Iglu Melbourne City', 
-    '/iglu.jpg', 
+    NULL, 
     '229 Franklin St, Melbourne', 
     ARRAY['包早餐', '设施新', '社交丰富'], 
     0, 0
   ),
   (
     'Yugo University Square', 
-    '/yugo.jpg', 
+    NULL, 
     '198 Pelham St, Carlton', 
     ARRAY['近墨大', '学习氛围好', '设施全'], 
     0, 0
   ),
   (
     'Journal Student Living', 
-    '/journal.jpg', 
+    NULL, 
     '500 Elizabeth St, Melbourne', 
     ARRAY['文艺风', '花园大', '社区感强'], 
     0, 0
   ),
   (
     'The Switch', 
-    '/switch.jpg', 
+    NULL, 
     '383 La Trobe St, Melbourne', 
     ARRAY['维妈旁', '科技感', '共享生活'], 
     0, 0
   ),
   (
     'Melbourne Grand', 
-    '/melbournegrand.jpg', 
+    NULL, 
     '560 Lonsdale St, Melbourne', 
     ARRAY['近南十字星', '高层', '现代风格'], 
     0, 0
